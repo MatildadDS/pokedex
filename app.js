@@ -1,57 +1,75 @@
-let url = "https://pokeapi.co/api/v2/pokemon?offset=0&limit=20";
-let fetch_config = {
+//1; configurer ma methode fetch
+const fetch_config = {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
     },
 }
 
-let next20 = "https://pokeapi.co/api/v2/pokemon?offset=20&limit=20";
-let previous20 = "";
+// 2; créer une variable offset = variable globale à laquelle on va ajouter ou retirer 20, plus bas 
+let offset = 0;
+let pokeIndex = 0;
+
+function getPokemons() {
+
+    const url = "https://pokeapi.co/api/v2/pokemon?offset=" + offset + "&limit=20";
+
+    // 3; requête Ajax (data est un tableau qui s'appelle results dans lequel il y a des données)
+    fetch(url, fetch_config)
+        .then(response => {
+            response.json().then(data => {
+
+                if (0 !== data.results.length) {
+                    // 4 ; nous allons vider la liste contenue dans right-container_screen
+                    const content = document.querySelector(".right-container__screen");
+                    content.innerHTML = '';
+                    pokeIndex = offset;
+
+                    // 5; puis parcourir tous les éléments du tableau results et les placer dans une variable poke dans laquelle on va ajouter chaque pokemon au fur et à mesure
+                    data.results.forEach(
+                        poke => {
+                            content.innerHTML += '<div class="list-item">' + ++pokeIndex + ' ' + poke.name + '</div>';
+                        }
+                    );
+
+                } else {
+                    alert('plus de pokemons!!!!');
+                }
+
+            });
+        });
+
+}
 
 
 
-fetch(url, fetch_config)
-    .then(response => {
-        console.log(response);
-        response.json().then(data => {
-            console.log(data)
-            data.results.forEach(poke => {
-                //console.log(data);
 
-                let content = document.querySelector(".right-container__screen")
-                //console.log(content)
-                let str = "";
+// 2a; fonction qui ajoute 20 pokemons à la liste 
+function nextPage() {
+    offset += 20;
+    getPokemons();
+}
 
-                str = `<div class="list-item">1. ${data.results[0].name}</div>
-                <div class="list-item">2. ${data.results[1].name}</div>
-                <div class="list-item">3. ${data.results[2].name}</div>
-                <div class="list-item">4. ${data.results[3].name}</div>
-                <div class="list-item">5. ${data.results[4].name}</div>
-                <div class="list-item">6. ${data.results[5].name}</div>
-                <div class="list-item">7. ${data.results[6].name}</div>
-                <div class="list-item">8. ${data.results[7].name}</div>
-                <div class="list-item">9. ${data.results[8].name}</div>
-                <div class="list-item">10. ${data.results[9].name}</div>
-                <div class="list-item">11. ${data.results[10].name}</div>
-                <div class="list-item">12. ${data.results[11].name}</div>
-                <div class="list-item">13. ${data.results[12].name}</div>
-                <div class="list-item">14. ${data.results[13].name}</div>
-                <div class="list-item">15. ${data.results[14].name}</div>
-                <div class="list-item">16. ${data.results[15].name}</div>
-                <div class="list-item">17. ${data.results[16].name}</div>
-                <div class="list-item">18. ${data.results[17].name}</div>
-                <div class="list-item">19. ${data.results[18].name}</div>
-                <div class="list-item">20. ${data.results[19].name}</div>`
+// 2b; fonction qui retire 20 pokemons à la liste mais empêche de chercher dans les négatifs
+function prevPage() {
+    if (offset > 20) {
+        offset -= 20;
+        getPokemons();
+    }
+}
 
-                content.innerHTML = str;
+// 5; DOMContentLoaded - le code ne sera exécuter que lorsque le document HTML initial aura été complètement chargé et analysé, sans attendre que les feuilles de style, images et sous-documents aient terminé de charger.
+document.addEventListener('DOMContentLoaded', function () {
 
-                let next = document.querySelector(".right-button");
-                //console.log(next)
+    getPokemons();
 
-                next.addEventListener('click', function () {
+    document.querySelector(".right-button").addEventListener('click', function () {
+        nextPage();
+    });
 
+    document.querySelector(".left-button").addEventListener('click', function () {
+        prevPage();
+    });
 
-                });
-            })
-        })
+}, false);
+
