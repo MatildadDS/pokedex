@@ -14,7 +14,7 @@ let previous20 = "";
 fetch(url, fetch_config)
     .then(response => {
         console.log(response);
-        response.json().then((data => {
+        response.json().then(data => {
             console.log(data)
             data.results.forEach(poke => {
                 //console.log(data);
@@ -46,8 +46,12 @@ fetch(url, fetch_config)
 
                 content.innerHTML = str;
 
+                let next = document.querySelector(".right-button");
+                //console.log(next)
+
+                next.addEventListener('click', function () {
 
 
-            });
-        }))
-    })
+                });
+            })
+        })
